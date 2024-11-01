@@ -5,9 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f9c246d0-9811-4378-b9db-0b7b51cbec20" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/runConfigurations/Run_the_application.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ch/heigvd/dai/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/heigvd/dai/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,7 +25,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "Application.Run the application.executor": "Debug",
+    "Application.Run the application.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "main",
@@ -50,7 +48,7 @@
       <recent name="\\wsl.localhost\Ubuntu\home\guillaume\DAI\Practical_work_2_Tron\.idea" />
     </key>
   </component>
-  <component name="RunManager" selected="Maven.Package application as JAR file">
+  <component name="RunManager" selected="Application.Run the application">
     <list>
       <item itemvalue="Application.Run the application" />
       <item itemvalue="Maven.Package application as JAR file" />
@@ -72,7 +70,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1730454968968</updated>
-      <workItem from="1730454969659" duration="1061000" />
+      <workItem from="1730454969659" duration="1541000" />
     </task>
     <servers />
   </component>
