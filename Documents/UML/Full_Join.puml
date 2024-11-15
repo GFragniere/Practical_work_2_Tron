@@ -1,0 +1,28 @@
+@startuml
+
+skin rose
+
+title Join the server as duplicate name or color
+
+...Only 2 player server...
+
+== Join the server ==
+
+
+Client1 -> Server: JOIN Killian red
+Server -> Client1: OK 112233
+
+Client2 -> Server: JOIN Guillaume red
+Server -> Client2: ERROR 2
+
+Client2 -> Server: JOIN Killian violet
+Server -> Client2: ERROR 1
+
+
+Client2 -> Server: JOIN Guillaume violet
+Server -> Client2: OK 112233
+
+Client3 -> Server: JOIN Bob blue
+Server -> Client3: ERROR 3
+
+@enduml

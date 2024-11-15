@@ -1,0 +1,51 @@
+@startuml
+
+skin rose
+
+title Functionnal exemple
+
+== Server info (optionnal) ==
+
+...Broadcast...
+
+Client1 <- Server: INFO 112233 10.9.200.8 42069 2 Server 1 Waiting Player
+Server -> Client2: INFO 112233 10.9.200.8 42069 2 Server 1 Waiting Player
+
+== Join the server ==
+
+Client1 -> Server: JOIN Killian red
+Server -> Client1: OK 112233
+
+Client2 -> Server: JOIN Guillaume violet
+Server -> Client2: OK 112233
+
+== Ready ==
+
+...Broadcast...
+
+Client1 <- Server: READY 112233
+Server -> Client2: READY 112233
+
+== Update from client ==
+
+...Killian change direction...
+
+Client1 -> Server: UPDATE 112233 <Player Object>
+
+...Guillaume change direction...
+
+Client2 -> Server: UPDATE 112233 <Player Object>
+
+==  Update from server ==
+
+...Broadcast every n millisecond...
+
+Client1 <- Server: UPDATE 112233 <Game Object>
+Client2 <- Server: UPDATE 112233 <Game Object>
+
+== Quit ==
+
+Client1 -> Server: QUIT 112233 Killian
+Client2 -> Server: QUIT 112233 Guillaume
+
+@enduml
