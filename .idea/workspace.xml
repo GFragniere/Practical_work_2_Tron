@@ -5,7 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f9c246d0-9811-4378-b9db-0b7b51cbec20" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Documents/RFC.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Documents/UML/Fonctional.puml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Documents/UML/Full_Join.puml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/Run_the_application.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/runConfigurations/Run_the_application.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -15,9 +19,9 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 8
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
   <component name="ProjectId" id="2oFAUYaPNwntBZlXcLeoTmTRbVH" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -26,11 +30,12 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.Run the application.executor": "Run",
+    "Maven.Package application as JAR file.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "RFCDocumentation",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "//wsl.localhost/Ubuntu/home/guillaume/DAI/Practical_work_2_Tron/.idea",
+    "last_opened_file_path": "//wsl.localhost/Ubuntu/home/killian/HEIG-VD/DAI/Practical_work_2_Tron/Documents/images/Fonctional.png",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -39,13 +44,17 @@
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.0",
     "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "CMakeSettings",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="\\wsl.localhost\Ubuntu\home\guillaume\DAI\Practical_work_2_Tron\.idea" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="\\wsl.localhost\Ubuntu\home\killian\HEIG-VD\DAI\Practical_work_2_Tron\Documents\UML" />
+      <recent name="\\wsl.localhost\Ubuntu\home\killian\HEIG-VD\DAI\Practical_work_2_Tron\Documents\images" />
     </key>
   </component>
   <component name="RunManager" selected="Application.Run the application">
@@ -71,6 +80,9 @@
       <option name="presentableId" value="Default" />
       <updated>1730454968968</updated>
       <workItem from="1730454969659" duration="1541000" />
+      <workItem from="1731055761239" duration="5679000" />
+      <workItem from="1731339487285" duration="82000" />
+      <workItem from="1731662972541" duration="4626000" />
     </task>
     <servers />
   </component>
