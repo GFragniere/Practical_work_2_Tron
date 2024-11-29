@@ -1,8 +1,8 @@
 package ch.heigvd.dai.game;
 
 import java.awt.*;
-import com.raylib.Jaylib.Vector2;
-import com.raylib.Jaylib.Color;
+import static com.raylib.Jaylib.Vector2;
+import static com.raylib.Jaylib.Color;
 
 
 enum Direction {
@@ -60,16 +60,16 @@ public class Player {
     public void move(){
         switch (direction) {
             case UP:
-                position.y(position.y() + 1);
+                position.y(position.y() - 1f);
                 break;
             case DOWN:
-                position.y(position.y() - 1);
+                position.y(position.y() + 1f);
                 break;
             case LEFT:
-                position.x(position.x() - 1);
+                position.x(position.x() - 1f);
                 break;
             case RIGHT:
-                position.x(position.x() + 1);
+                position.x(position.x() + 1f);
                 break;
             default:
         }
