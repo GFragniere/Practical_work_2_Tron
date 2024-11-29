@@ -69,4 +69,13 @@ public class Tronocol {
     public Player[] getPlayer(){
         return players.clone();
     }
+
+    public void updateGameFromPlayer(Player player) {
+        for (int i = 0; i < numberOfPlayer; i++) {
+            if (players[i].getName().contentEquals(player.getName())) {
+                players[i] = player;
+                return;
+            }
+        }
+    }
 }

@@ -29,7 +29,6 @@ public class Client implements Callable<Integer>{
 
     @Override
     public Integer call() {
-        throw new UnsupportedOperationException(
-                "Please remove this exception and implement this method.");
+        new Client()
     }
 }
