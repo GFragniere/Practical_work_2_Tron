@@ -1,7 +1,9 @@
 package ch.heigvd.dai;
 import java.io.File;
 import ch.heigvd.dai.commands.Root;
+import ch.heigvd.dai.game.TronocolGraphics;
 import picocli.CommandLine;
+
 
 public class Main {
 

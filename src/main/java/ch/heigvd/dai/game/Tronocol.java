@@ -1,5 +1,5 @@
 package ch.heigvd.dai.game;
-import com.raylib.Jaylib.Color;
+import static com.raylib.Jaylib.Color;
 
 import java.util.Arrays;
 
@@ -8,15 +8,22 @@ public class Tronocol {
     private int currentNumberOfPlayer = 0;
     private Player[] players;
     private Color[][] world;
-    final private Color boardColor;
+    final private Color boardColor = new Color(0,0,0,255);
+    final private Color borderColor = new Color(200,0,200,255);
 
     public Tronocol(int numberOfPlayer,int height,int width) {
         this.numberOfPlayer = numberOfPlayer;
         this.world = new Color[height][width];
         this.players = new Player[numberOfPlayer];
-        this.boardColor = new Color(0,0,0,0);
-        for (Color[] row : world)
-            Arrays.fill(row, boardColor);
+        for(int y = 0; y < world.length; y++) {
+            for(int x = 0; x < world[0].length; x++) {
+                if(y == 0 || y == world.length - 1 || x == 0 || x == world[0].length - 1) {
+                    world[y][x] = borderColor;
+                }else{
+                    world[y][x] = boardColor;
+                }
+            }
+        }
     }
 
     public void addPlayer(Player player) {
@@ -42,10 +49,7 @@ public class Tronocol {
     }
 
     private boolean collision(Player player) {
-        if(world[(int) player.getPosition().y()][(int) player.getPosition().x()].equals(boardColor)){
-            return false;
-        }
-        return true;
+        return !world[(int) player.getPosition().y()][(int) player.getPosition().x()].equals(boardColor);
     }
 
     private void removePlayerFromBoard(Player player) {
@@ -56,5 +60,13 @@ public class Tronocol {
                 }
             }
         }
+    }
+
+    public Color[][] getWorld() {
+        return world.clone();
+    }
+
+    public Player[] getPlayer(){
+        return players.clone();
     }
 }
