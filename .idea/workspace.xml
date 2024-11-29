@@ -5,11 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f9c246d0-9811-4378-b9db-0b7b51cbec20" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/ch/heigvd/dai/game/TronocolGraphics.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/Run_the_application.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/runConfigurations/Run_the_application.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ch/heigvd/dai/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/heigvd/dai/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ch/heigvd/dai/game/Player.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/heigvd/dai/game/Player.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ch/heigvd/dai/game/Tronocol.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/heigvd/dai/game/Tronocol.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ch/heigvd/dai/tronocol/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/heigvd/dai/tronocol/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ch/heigvd/dai/tronocol/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/heigvd/dai/tronocol/Server.java" afterDir="false" />
+    </list>
+    <list id="f4fb4ba0-d6f6-4bc8-8bb8-52d96315f150" name="Changes by killi" comment="">
+      <change beforePath="$PROJECT_DIR$/Documents/RFC.md" beforeDir="false" afterPath="$PROJECT_DIR$/Documents/RFC.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ch/heigvd/dai/commands/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/heigvd/dai/commands/Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ch/heigvd/dai/tronocol/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ch/heigvd/dai/tronocol/Client.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,10 +31,21 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="KubernetesApiPersistence">{}</component>
-  <component name="KubernetesApiProvider">{
-  &quot;isMigrated&quot;: true
-}</component>
+  <component name="LineStatusTrackerManager">
+    <file path="$PROJECT_DIR$/src/main/java/ch/heigvd/dai/tronocol/Client.java">
+      <ranges>
+        <range start1="0" end1="1" start2="0" end2="1" changelist="f9c246d0-9811-4378-b9db-0b7b51cbec20" />
+        <range start1="2" end1="2" start2="2" end2="5" changelist="f4fb4ba0-d6f6-4bc8-8bb8-52d96315f150" />
+        <range start1="3" end1="3" start2="6" end2="7" changelist="f4fb4ba0-d6f6-4bc8-8bb8-52d96315f150" />
+        <range start1="4" end1="4" start2="8" end2="10" changelist="f4fb4ba0-d6f6-4bc8-8bb8-52d96315f150" />
+        <range start1="10" end1="10" start2="16" end2="18" changelist="f4fb4ba0-d6f6-4bc8-8bb8-52d96315f150" />
+        <range start1="16" end1="16" start2="24" end2="26" changelist="f4fb4ba0-d6f6-4bc8-8bb8-52d96315f150" />
+        <range start1="18" end1="19" start2="28" end2="29" changelist="f9c246d0-9811-4378-b9db-0b7b51cbec20" />
+        <range start1="40" end1="40" start2="50" end2="75" changelist="f4fb4ba0-d6f6-4bc8-8bb8-52d96315f150" />
+        <range start1="63" end1="64" start2="98" end2="99" changelist="f4fb4ba0-d6f6-4bc8-8bb8-52d96315f150" />
+      </ranges>
+    </file>
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
 }</component>
@@ -44,9 +60,9 @@
     &quot;Maven.Package application as JAR file.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;GameGraphics&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;udp__implementation&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;//wsl.localhost/Ubuntu/home/killian/HEIG-VD/DAI/Practical_work_2_Tron/Documents/images/Fonctional.png&quot;,
+    &quot;last_opened_file_path&quot;: &quot;//wsl.localhost/Ubuntu/home/guillaume/DAI/Practical_work_2_Tron/src/main/java/ch/heigvd/dai&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -94,14 +110,6 @@
       <workItem from="1731055761239" duration="5679000" />
       <workItem from="1731339487285" duration="82000" />
       <workItem from="1731662972541" duration="4626000" />
-      <workItem from="1732280241447" duration="1818000" />
-      <workItem from="1732282130045" duration="770000" />
-      <workItem from="1732282918263" duration="2950000" />
-      <workItem from="1732448034830" duration="8000" />
-      <workItem from="1732528248562" duration="2004000" />
-      <workItem from="1732627159213" duration="42000" />
-      <workItem from="1732872045048" duration="264000" />
-      <workItem from="1732872322774" duration="2097000" />
     </task>
     <servers />
   </component>

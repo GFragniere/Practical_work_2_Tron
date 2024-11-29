@@ -1,22 +1,32 @@
-package calculator.operator.tronocol;
+package ch.heigvd.dai.tronocol;
+
+import ch.heigvd.dai.game.Tronocol;
+import ch.heigvd.dai.game.TronocolGraphics;
 
 import java.net.*;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
+
+import static com.raylib.Jaylib.Color;
 
 public class Client {
     private final int PORT;
     private final String MULTICAST_ADDRESS;
     private final String HOST;
     private final String NETWORK_INTERFACE;
+    private Tronocol tronocol;
+    private final TronocolGraphics tronocolGraphics;
 
     public Client(int PORT, String MULTICAST_ADDRESS, String HOST, String NETWORK_INTERFACE) {
         this.PORT = PORT;
         this.MULTICAST_ADDRESS = MULTICAST_ADDRESS;
         this.HOST = HOST;
         this.NETWORK_INTERFACE = NETWORK_INTERFACE;
+        this.tronocol = new Tronocol(1, TronocolGraphics.HEIGHT/TronocolGraphics.BLOCKSIZE,TronocolGraphics.WIDTH/TronocolGraphics.BLOCKSIZE);
+        this.tronocolGraphics = new TronocolGraphics(tronocol);
     }
 
-    public void connect() {
+    public void start() {
         System.out.println("[Client] starting");
         System.out.println("[Client] transmitting to server via port " + PORT);
         Thread unicastThread = new Thread(new UnicastTransmission(PORT, HOST));
@@ -38,6 +48,31 @@ public class Client {
         @Override
         public void run() {
             try(DatagramSocket socket = new DatagramSocket()){
+                String command = "JOIN";
+                String username = "Habarosk";
+                Color color = new Color(255,0,0,255);
+                try
+                {
+                    InetAddress address = InetAddress.getByName(HOST);
+                    ByteArrayOutputStream byteStream = new ByteArrayOutputStream(10000);
+                    ObjectOutputStream os = new ObjectOutputStream(new BufferedOutputStream(byteStream));
+                    os.flush();
+                    os.writeObject(command);
+                    os.writeObject(username);
+                    os.writeObject(color);
+                    os.flush();
+                    //retrieves byte array
+                    byte[] sendBuf = byteStream.toByteArray();
+                    DatagramPacket packet = new DatagramPacket(sendBuf, sendBuf.length, address, PORT);
+                    socket.send(packet);
+                    os.close();
+                }
+                catch (UnknownHostException e)
+                {
+                    System.err.println("Exception:  " + e);
+                    e.printStackTrace();
+                }
+                /*
                 InetAddress serverAddress = InetAddress.getByName(HOST);
 
                 // Example message in order to have an errorless file
@@ -61,7 +96,7 @@ public class Client {
                 socket.receive(responsePacket);
 
                 // Treat the data corresponding to the received response
-
+                */
 
             } catch (Exception e) {
                 System.err.println("[Client] An error occurred: " + e.getMessage());

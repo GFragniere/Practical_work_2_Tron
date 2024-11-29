@@ -1,5 +1,12 @@
-package calculator.operator.tronocol;
+package ch.heigvd.dai.tronocol;
 
+import ch.heigvd.dai.game.Player;
+import ch.heigvd.dai.game.Tronocol;
+import ch.heigvd.dai.game.TronocolGraphics;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -9,6 +16,9 @@ public class Server {
     private final String MULTICAST_ADDRESS;
     private final int PORT;
     private final int frequency;
+    private final Tronocol game = new Tronocol(4,
+            TronocolGraphics.HEIGHT / TronocolGraphics.BLOCKSIZE,
+            TronocolGraphics.WIDTH / TronocolGraphics.BLOCKSIZE);
 
     public Server(String MULTICAST_ADRESS, int PORT, int frequency) {
         this.MULTICAST_ADDRESS = MULTICAST_ADRESS;
@@ -40,13 +50,33 @@ public class Server {
             try (DatagramSocket socket = new DatagramSocket(PORT)) {
                 while (!socket.isClosed()) {
                     // Create a buffer for the incoming request
-                    byte[] requestBuffer = new byte[1024];
+                    byte[] requestBuffer = new byte[10000];
 
                     // Create a packet for the incoming request
                     DatagramPacket requestPacket = new DatagramPacket(requestBuffer, requestBuffer.length);
 
                     // Receive the packet - this is a blocking call
                     socket.receive(requestPacket);
+
+                    ByteArrayInputStream byteStream = new
+                            ByteArrayInputStream(requestBuffer);
+                    ObjectInputStream is = new
+                            ObjectInputStream(new BufferedInputStream(byteStream));
+                    String request = (String) is.readObject();
+
+                    switch (request){
+                        case "JOIN":
+                            System.out.println("[Server] joining");
+                            break;
+
+                        case "UPDATE":
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    is.close();
 
                     // Treat the received data here
 
