@@ -4,15 +4,13 @@ import ch.heigvd.dai.game.Player;
 import ch.heigvd.dai.game.Tronocol;
 import ch.heigvd.dai.game.TronocolGraphics;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 
-public class Server {
+public class TronocolServer {
     private final String MULTICAST_ADDRESS;
     private final int PORT;
     private final int frequency;
@@ -20,7 +18,7 @@ public class Server {
             TronocolGraphics.HEIGHT / TronocolGraphics.BLOCKSIZE,
             TronocolGraphics.WIDTH / TronocolGraphics.BLOCKSIZE);
 
-    public Server(String MULTICAST_ADRESS, int PORT, int frequency) {
+    public TronocolServer(String MULTICAST_ADRESS, int PORT, int frequency) {
         this.MULTICAST_ADDRESS = MULTICAST_ADRESS;
         this.PORT = PORT;
         this.frequency = frequency;
@@ -58,15 +56,49 @@ public class Server {
                     // Receive the packet - this is a blocking call
                     socket.receive(requestPacket);
 
-                    ByteArrayInputStream byteStream = new
+                    // Sender address
+                    InetAddress address = InetAddress.getByName(requestPacket.getAddress().getHostAddress());
+
+                    ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream(10000);
+                    ObjectOutputStream os = new ObjectOutputStream(new BufferedOutputStream(byteOutputStream));
+
+                    ByteArrayInputStream byteInputStream = new
                             ByteArrayInputStream(requestBuffer);
                     ObjectInputStream is = new
-                            ObjectInputStream(new BufferedInputStream(byteStream));
+                            ObjectInputStream(new BufferedInputStream(byteInputStream));
                     String request = (String) is.readObject();
+
+                    String response = "";
+                    Integer error;
+
+                    byte[] responseBuffer = request.getBytes(StandardCharsets.UTF_8);
 
                     switch (request){
                         case "JOIN":
                             System.out.println("[Server] joining");
+                            String name = (String) is.readObject();
+                            String color = (String) is.readObject();
+                            for (Player player : game.getPlayer()) {
+                                if (player.getName().equals(name)) {
+                                    response = "ERROR";
+                                    error = 1;
+                                    os.writeObject(response);
+                                    os.writeObject(error);
+                                    break;
+                                } else if (player.getColor().equals(color)) {
+                                    response = "ERROR";
+                                    error = 2;
+                                    os.writeObject(response);
+                                    os.writeObject(error);
+                                    break;
+                                }
+                            }
+                            if (!response.contentEquals("ERROR")) {
+                                response = "OK";
+                                // game.addPlayer(new Player(name, color,));
+                                os.writeObject(response);
+                            }
+                            os.flush();
                             break;
 
                         case "UPDATE":
@@ -78,25 +110,10 @@ public class Server {
 
                     is.close();
 
-                    // Treat the received data here
-
-
-                    // Prepare the response
-                    String response = "Hello, client! I'm the server. 👻";
-
-                    // Transform the message into a byte array - always specify the encoding
-                    byte[] responseBuffer = response.getBytes(StandardCharsets.UTF_8);
-
-                    // Create a packet with the message, the client address and the client port
-                    DatagramPacket responsePacket =
-                            new DatagramPacket(
-                                    responseBuffer,
-                                    responseBuffer.length,
-                                    requestPacket.getAddress(),
-                                    requestPacket.getPort());
-
-                    // Send the packet
-                    socket.send(responsePacket);
+                    byte[] sendBuf = byteOutputStream.toByteArray();
+                    DatagramPacket packet = new DatagramPacket(sendBuf, sendBuf.length, address, requestPacket.getPort());
+                    socket.send(packet);
+                    os.close();
 
                 }
             } catch (Exception e) {

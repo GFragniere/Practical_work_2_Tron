@@ -5,11 +5,10 @@ import ch.heigvd.dai.game.TronocolGraphics;
 
 import java.net.*;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 
 import static com.raylib.Jaylib.Color;
 
-public class Client {
+public class TronocolClient {
     private final int PORT;
     private final String MULTICAST_ADDRESS;
     private final String HOST;
@@ -17,7 +16,7 @@ public class Client {
     private Tronocol tronocol;
     private final TronocolGraphics tronocolGraphics;
 
-    public Client(int PORT, String MULTICAST_ADDRESS, String HOST, String NETWORK_INTERFACE) {
+    public TronocolClient(int PORT, String MULTICAST_ADDRESS, String HOST, String NETWORK_INTERFACE) {
         this.PORT = PORT;
         this.MULTICAST_ADDRESS = MULTICAST_ADDRESS;
         this.HOST = HOST;
@@ -31,9 +30,8 @@ public class Client {
         System.out.println("[Client] transmitting to server via port " + PORT);
         Thread unicastThread = new Thread(new UnicastTransmission(PORT, HOST));
         unicastThread.start();
-
-        Thread multicastThread = new Thread(new MulticastTransmission(MULTICAST_ADDRESS, PORT, NETWORK_INTERFACE));
-        multicastThread.start();
+        //Thread multicastThread = new Thread(new MulticastTransmission(MULTICAST_ADDRESS, PORT, NETWORK_INTERFACE));
+        //multicastThread.start();
     }
 
     class UnicastTransmission implements Runnable {
@@ -47,63 +45,62 @@ public class Client {
 
         @Override
         public void run() {
-            try(DatagramSocket socket = new DatagramSocket()){
+            try(DatagramSocket socket = new DatagramSocket();){
                 String command = "JOIN";
                 String username = "Habarosk";
                 Color color = new Color(255,0,0,255);
                 try
                 {
+                    //Create all the necessary buffered output/input
+
+                    //input
+                    byte[] requestBuffer = new byte[10000];
+                    DatagramPacket requestPacket = new DatagramPacket(requestBuffer, requestBuffer.length);
+
+                    ByteArrayInputStream byteStreamIn = new ByteArrayInputStream(requestBuffer);
+                    ObjectInputStream is = new ObjectInputStream(new BufferedInputStream(byteStreamIn));
+
+                    //output
+                    ByteArrayOutputStream byteStreamOut = new ByteArrayOutputStream(10000);
+                    ObjectOutputStream os = new ObjectOutputStream(new BufferedOutputStream(byteStreamOut));
+
                     InetAddress address = InetAddress.getByName(HOST);
-                    ByteArrayOutputStream byteStream = new ByteArrayOutputStream(10000);
-                    ObjectOutputStream os = new ObjectOutputStream(new BufferedOutputStream(byteStream));
-                    os.flush();
+
+                    //write object to send
                     os.writeObject(command);
                     os.writeObject(username);
                     os.writeObject(color);
                     os.flush();
-                    //retrieves byte array
-                    byte[] sendBuf = byteStream.toByteArray();
-                    DatagramPacket packet = new DatagramPacket(sendBuf, sendBuf.length, address, PORT);
-                    socket.send(packet);
-                    os.close();
+
+                    //send datagram to server
+                    byte[] sendBuf = byteStreamOut.toByteArray();
+                    DatagramPacket sendpacket = new DatagramPacket(sendBuf, sendBuf.length, address, PORT);
+                    socket.send(sendpacket);
+
+                    //receive datagram from server
+                    socket.receive(requestPacket);
+                    String response = (String) is.readObject();
+
+                    switch(response){
+                        case "OK":
+                            System.out.println("OK");
+                            break;
+                        case "ERROR":
+                            Integer code = (Integer) is.readObject();
+                            System.out.println("ERROR: " + code);
+                    }
                 }
                 catch (UnknownHostException e)
                 {
                     System.err.println("Exception:  " + e);
                     e.printStackTrace();
                 }
-                /*
-                InetAddress serverAddress = InetAddress.getByName(HOST);
-
-                // Example message in order to have an errorless file
-                String MESSAGE = "2";
-
-                // Transform the message into a byte array - always specify the encoding
-                byte[] buffer = MESSAGE.getBytes(StandardCharsets.UTF_8);
-
-                // Create a packet with the message, the server address and the port
-                DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, PORT);
-
-                // Send the packet
-                socket.send(packet);
-
-                byte[] responseBuffer = new byte[1024];
-
-                // Create a packet for the incoming response
-                DatagramPacket responsePacket = new DatagramPacket(responseBuffer, responseBuffer.length);
-
-                // Receive the packet - this is a blocking call
-                socket.receive(responsePacket);
-
-                // Treat the data corresponding to the received response
-                */
-
             } catch (Exception e) {
                 System.err.println("[Client] An error occurred: " + e.getMessage());
             }
         }
     }
-
+    /*
     class MulticastTransmission implements Runnable {
         private final String MULTICAST_ADDRESS;
         private final int PORT;
@@ -144,5 +141,5 @@ public class Client {
                 System.err.println("[Client] An error occurred: " + e.getMessage());
             }
         }
-    }
+    }*/
 }

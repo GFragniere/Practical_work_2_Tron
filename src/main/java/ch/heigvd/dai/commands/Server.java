@@ -1,6 +1,8 @@
 package ch.heigvd.dai.commands;
 import java.net.InetAddress;
 import java.util.concurrent.Callable;
+
+import ch.heigvd.dai.tronocol.TronocolServer;
 import picocli.CommandLine;
 
 @CommandLine.Command(
@@ -32,8 +34,9 @@ public class Server implements  Callable<Integer>{
 
     @Override
     public Integer call() {
-        throw new UnsupportedOperationException(
-                "Please remove this exception and implement this method.");
+        TronocolServer server = new TronocolServer(multicastAddress, port, frequency);
+        server.start();
+        return 0;
     }
 }
 
