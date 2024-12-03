@@ -1,6 +1,7 @@
 package ch.heigvd.dai.commands;
 import java.util.concurrent.Callable;
 import picocli.CommandLine;
+import ch.heigvd.dai.tronocol.*;
 
 @CommandLine.Command(
         name = "client",
@@ -29,6 +30,8 @@ public class Client implements Callable<Integer>{
 
     @Override
     public Integer call() {
-        new Client()
+        TronocolClient tronocolClient = new TronocolClient(port,multicastAddress,host,"e0/1");
+        tronocolClient.start();
+        return 0;
     }
 }
