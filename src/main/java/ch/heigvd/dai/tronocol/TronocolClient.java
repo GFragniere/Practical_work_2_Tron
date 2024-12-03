@@ -3,10 +3,9 @@ package ch.heigvd.dai.tronocol;
 import ch.heigvd.dai.game.Tronocol;
 import ch.heigvd.dai.game.TronocolGraphics;
 
+import java.awt.*;
 import java.net.*;
 import java.io.*;
-
-import static com.raylib.Jaylib.Color;
 
 public class TronocolClient {
     private final int PORT;
@@ -30,6 +29,7 @@ public class TronocolClient {
         System.out.println("[Client] transmitting to server via port " + PORT);
         Thread unicastThread = new Thread(new UnicastTransmission(PORT, HOST));
         unicastThread.start();
+        while(true);
         //Thread multicastThread = new Thread(new MulticastTransmission(MULTICAST_ADDRESS, PORT, NETWORK_INTERFACE));
         //multicastThread.start();
     }
@@ -52,14 +52,6 @@ public class TronocolClient {
                 try
                 {
                     //Create all the necessary buffered output/input
-
-                    //input
-                    byte[] requestBuffer = new byte[10000];
-                    DatagramPacket requestPacket = new DatagramPacket(requestBuffer, requestBuffer.length);
-
-                    ByteArrayInputStream byteStreamIn = new ByteArrayInputStream(requestBuffer);
-                    ObjectInputStream is = new ObjectInputStream(new BufferedInputStream(byteStreamIn));
-
                     //output
                     ByteArrayOutputStream byteStreamOut = new ByteArrayOutputStream(10000);
                     ObjectOutputStream os = new ObjectOutputStream(new BufferedOutputStream(byteStreamOut));
@@ -78,7 +70,14 @@ public class TronocolClient {
                     socket.send(sendpacket);
 
                     //receive datagram from server
+                    byte[] requestBuffer = new byte[10000];
+                    DatagramPacket requestPacket = new DatagramPacket(requestBuffer, requestBuffer.length);
+
                     socket.receive(requestPacket);
+
+                    ByteArrayInputStream byteStreamIn = new ByteArrayInputStream(requestBuffer);
+                    ObjectInputStream is = new ObjectInputStream(new BufferedInputStream(byteStreamIn));
+
                     String response = (String) is.readObject();
 
                     switch(response){

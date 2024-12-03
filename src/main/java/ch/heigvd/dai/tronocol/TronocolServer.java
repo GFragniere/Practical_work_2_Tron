@@ -4,6 +4,7 @@ import ch.heigvd.dai.game.Player;
 import ch.heigvd.dai.game.Tronocol;
 import ch.heigvd.dai.game.TronocolGraphics;
 
+import java.awt.*;
 import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -17,6 +18,7 @@ public class TronocolServer {
     private final Tronocol game = new Tronocol(4,
             TronocolGraphics.HEIGHT / TronocolGraphics.BLOCKSIZE,
             TronocolGraphics.WIDTH / TronocolGraphics.BLOCKSIZE);
+    private boolean running = true;
 
     public TronocolServer(String MULTICAST_ADRESS, int PORT, int frequency) {
         this.MULTICAST_ADDRESS = MULTICAST_ADRESS;
@@ -30,9 +32,9 @@ public class TronocolServer {
         System.out.println("[Server] listening on port " + PORT);
         Thread clientThread = new Thread(new ClientsHandler(PORT));
         clientThread.start();
-
         Thread multicastThread = new Thread(new MulticastEmitter(MULTICAST_ADDRESS, frequency));
         multicastThread.start();
+        while (running) {}
     }
 
     class ClientsHandler implements Runnable {
@@ -62,10 +64,8 @@ public class TronocolServer {
                     ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream(10000);
                     ObjectOutputStream os = new ObjectOutputStream(new BufferedOutputStream(byteOutputStream));
 
-                    ByteArrayInputStream byteInputStream = new
-                            ByteArrayInputStream(requestBuffer);
-                    ObjectInputStream is = new
-                            ObjectInputStream(new BufferedInputStream(byteInputStream));
+                    ByteArrayInputStream byteInputStream = new ByteArrayInputStream(requestBuffer);
+                    ObjectInputStream is = new ObjectInputStream(new BufferedInputStream(byteInputStream));
                     String request = (String) is.readObject();
 
                     String response = "";
@@ -77,8 +77,10 @@ public class TronocolServer {
                         case "JOIN":
                             System.out.println("[Server] joining");
                             String name = (String) is.readObject();
-                            String color = (String) is.readObject();
-                            for (Player player : game.getPlayer()) {
+                            Color color = (Color) is.readObject();
+                            System.out.println("[Server] color: " + color);
+                            System.out.println("[Server] name: " + name);
+                            /*for (Player player : game.getPlayer()) {
                                 if (player.getName().equals(name)) {
                                     response = "ERROR";
                                     error = 1;
@@ -92,7 +94,7 @@ public class TronocolServer {
                                     os.writeObject(error);
                                     break;
                                 }
-                            }
+                            }*/
                             if (!response.contentEquals("ERROR")) {
                                 response = "OK";
                                 // game.addPlayer(new Player(name, color,));
@@ -119,6 +121,7 @@ public class TronocolServer {
             } catch (Exception e) {
                 System.err.println("[Server] An error occurred: " + e.getMessage());
             }
+            running = false;
         }
     }
 
