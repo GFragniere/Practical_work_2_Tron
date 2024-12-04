@@ -20,7 +20,7 @@ public class TronocolClient {
     private final String NETWORK_INTERFACE;
     private final String USERNAME;
     private final Color COLOR;
-    private Tronocol tronocol;
+    protected Tronocol tronocol;
     private final TronocolGraphics tronocolGraphics;
     private UnicastTransmission unicastTransmission;
 
@@ -43,7 +43,9 @@ public class TronocolClient {
         unicastThread.start();
         Thread multicastThread = new Thread(new MulticastTransmission(MULTICAST_ADDRESS, PORT, NETWORK_INTERFACE));
         multicastThread.start();
-        tronocolGraphics.run();
+        Thread graphicThread = new Thread(tronocolGraphics);
+        graphicThread.start();
+        while(true);
     }
 
     public void send_update(Object ... objects){
@@ -148,6 +150,7 @@ public class TronocolClient {
                 socket.joinGroup(multicastGroup, networkInterface);
 
                 while (!socket.isClosed()) {
+
                     byte[] requestBuffer = new byte[10000];
                     DatagramPacket requestPacket = new DatagramPacket(requestBuffer, requestBuffer.length);
                     socket.receive(requestPacket);
@@ -156,10 +159,8 @@ public class TronocolClient {
 
                     // Receive the packet - this is a blocking call
                     socket.receive(requestPacket);
-
                     // Treat the data from the listened multicast here
-                    tronocol = (Tronocol) is.readObject();
-                    System.out.println(tronocol);
+                    tronocolGraphics.setGame((Tronocol) is.readObject());
                 }
                 // Quit the multicast group
                 socket.leaveGroup(multicastGroup, networkInterface);

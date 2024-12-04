@@ -7,8 +7,8 @@ import java.awt.Color;
 
 public class TronocolGraphics implements Runnable{
 
-    public final static int HEIGHT = 400;
-    public final static int WIDTH = 400;
+    public final static int HEIGHT = 200;
+    public final static int WIDTH = 200;
     public final static int BLOCKSIZE = 5;
     private boolean shouldExit = false;
     private final static String UPDATE = "UPDATE";
@@ -18,6 +18,10 @@ public class TronocolGraphics implements Runnable{
     public TronocolGraphics(Tronocol game, TronocolClient tronocolClient){
         this.game = game;
         this.client = tronocolClient;
+    }
+
+    public void setGame(Tronocol game) {
+        this.game = game;
     }
 
     public void updateGame(Tronocol game){
@@ -32,9 +36,11 @@ public class TronocolGraphics implements Runnable{
     public void run() {
         SetTraceLogLevel(7);
         InitWindow(WIDTH, HEIGHT, "Tronocol");
+        SetTargetFPS(60);
         while (!WindowShouldClose() && !shouldExit) {
             BeginDrawing();
             if(this.game.GameReady()){
+                System.out.println("Coucou");
                 if (IsKeyDown(KEY_LEFT)) client.send_update(UPDATE,Direction.LEFT);
                 if (IsKeyDown(KEY_RIGHT)) client.send_update(UPDATE,Direction.RIGHT);
                 if (IsKeyDown(KEY_DOWN)) client.send_update(UPDATE,Direction.DOWN);
