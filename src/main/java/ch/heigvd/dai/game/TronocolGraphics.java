@@ -41,10 +41,10 @@ public class TronocolGraphics implements Runnable{
             BeginDrawing();
             if(this.game.GameReady()){
                 System.out.println("Coucou");
-                if (IsKeyDown(KEY_LEFT)) client.send_update(UPDATE,Direction.LEFT);
-                if (IsKeyDown(KEY_RIGHT)) client.send_update(UPDATE,Direction.RIGHT);
-                if (IsKeyDown(KEY_DOWN)) client.send_update(UPDATE,Direction.DOWN);
-                if (IsKeyDown(KEY_UP)) client.send_update(UPDATE,Direction.UP);
+                if (IsKeyDown(KEY_LEFT)) client.send_update(UPDATE,Integer.valueOf(2));
+                if (IsKeyDown(KEY_RIGHT)) client.send_update(UPDATE,Integer.valueOf(3));
+                if (IsKeyDown(KEY_DOWN)) client.send_update(UPDATE,Integer.valueOf(1));
+                if (IsKeyDown(KEY_UP)) client.send_update(UPDATE, Integer.valueOf(0));
                 ClearBackground(BLACK);
 
                 Color[][] world = game.getWorld();
