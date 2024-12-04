@@ -3,7 +3,8 @@
     <option name="ALTERNATIVE_JRE_PATH" value="temurin-21 (WSL)" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <option name="MAIN_CLASS_NAME" value="ch.heigvd.dai.Main" />
-    <module name="DAI_Practical_Work_1_Magic_Image_CLI" />
+    <module name="Practical_work_2_Tron" />
+    <option name="PROGRAM_PARAMETERS" value="Server" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

@@ -1,19 +1,31 @@
 package ch.heigvd.dai.game;
-import static com.raylib.Jaylib.Color;
+import java.awt.*;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
-public class Tronocol {
+public class Tronocol implements Serializable{
+
+    private static int worldWidth = TronocolGraphics.WIDTH / TronocolGraphics.BLOCKSIZE;
+    private static int worldHeight = TronocolGraphics.HEIGHT / TronocolGraphics.BLOCKSIZE;
+
+    public static final Vector2D[] POSITIONS = {
+            new Vector2D(5, 5),
+            new Vector2D(worldWidth - 5, worldHeight - 5),
+            new Vector2D(5, worldHeight - 5),
+            new Vector2D(worldWidth - 5,  5),
+    };
+
     final private int numberOfPlayer;
     private int currentNumberOfPlayer = 0;
     private Player[] players;
-    private Color[][] world;
-    final private Color boardColor = new Color(0,0,0,255);
-    final private Color borderColor = new Color(200,0,200,255);
+    private short[][] world;
+    final private int boardColor = 4;
+    final private int borderColor = 5;
 
     public Tronocol(int numberOfPlayer,int height,int width) {
         this.numberOfPlayer = numberOfPlayer;
-        this.world = new Color[height][width];
+        this.world = new short[height][width];
         this.players = new Player[numberOfPlayer];
         for(int y = 0; y < world.length; y++) {
             for(int x = 0; x < world[0].length; x++) {
@@ -34,6 +46,10 @@ public class Tronocol {
         return currentNumberOfPlayer == numberOfPlayer;
     }
 
+    public int getCurrentNumberOfPlayer() {
+        return currentNumberOfPlayer;
+    }
+
     public void update(){
         for(Player player : players){
             if(!player.isDead()) {
@@ -42,31 +58,40 @@ public class Tronocol {
                     removePlayerFromBoard(player);
                     continue;
                 }
-                world[(int) player.getPosition().y()][(int) player.getPosition().x()] = player.getColor();
+                world[(int) player.getPosition().getY()][(int) player.getPosition().getX()] = player.getColor();
                 player.move();
             }
         }
     }
 
     private boolean collision(Player player) {
-        return !world[(int) player.getPosition().y()][(int) player.getPosition().x()].equals(boardColor);
+        return !(world[(int) player.getPosition().getY()][(int) player.getPosition().getX()] == boardColor);
     }
 
     private void removePlayerFromBoard(Player player) {
         for(int y = 0; y < world.length; y++){
             for(int x = 0; x < world[y].length; x++){
-                if(world[y][x].equals(player.getColor())){
+                if(world[y][x] == player.getColor()){
                     world[y][x] = boardColor;
                 }
             }
         }
     }
 
-    public Color[][] getWorld() {
-        return world.clone();
+    public short[][] getWorld() {
+        return world;
     }
 
     public Player[] getPlayer(){
-        return players.clone();
+        return players;
+    }
+
+    public void updateGameFromPlayer(Player player) {
+        for (int i = 0; i < numberOfPlayer; i++) {
+            if (players[i].getName().contentEquals(player.getName())) {
+                players[i] = player;
+                return;
+            }
+        }
     }
 }

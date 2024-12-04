@@ -54,8 +54,7 @@ JOIN <username> <color>
 
 #### Response
 
-- `OK <session_id>`: both the username and the color are available and the user is registered.
-  - `session_id` : the game session's id the user is connected to.
+- `OK`: both the username and the color are available and the user is registered.
 - `ERROR <code>`: The username or the color is not available.
     - `1` : The username is already used.
     - `2` : The color is already used.
@@ -68,9 +67,8 @@ The server sends a broadcast message to all the client to start the games
 #### Request
 
 ```Tronocol
-READY <session_id> 
+READY
 ```
-- `session_id`:  the game session's id the user is connected to.
 
 #### Response
 None.
@@ -82,10 +80,9 @@ The client sends its player data to the server.
 #### Request
 
 ```Tronocol
-UPDATE <session_id> <player_data>
+UPDATE <player_data>
 ```
 
-- `session_id`: the game session's id the user is connected to.
 - `player_data`: the player object as binary data.
 
 #### Response`
@@ -99,10 +96,9 @@ The server sends the world to all clients.
 #### Request
 
 ```Tronocol
-UPDATE <session_id> <world_data>
+UPDATE  <world_data>
 ```
 
-- `session_id`: the game session's id the user is connected to.
 - `world_data`: the data of the world as binary data.
 
 #### Response
@@ -116,15 +112,13 @@ The client leaves from the server.
 #### Request
 
 ```Tronocol
-QUIT <session_id> <username>
+QUIT <username>
 ```
-- `session_id` : the game session's id the user is connected to.
 - `username` : the user's name.
 
 #### Response
 
 None.
-
 
 (Optional)
 
@@ -135,10 +129,9 @@ The server broadcast its information so every client can see the available serve
 #### Request
 
 ```Tronocol
-INFO <session_id> <ip> <port> <number_of_player> <description> <status>
+INFO <ip> <port> <number_of_player> <description> <status>
 ```
 
-- `session_id` : the game session's id the user is connected to.
 - `ip` : the server's ip.
 - `port` : the serve's port.
 - `number_of_player` : the number of player that join the session

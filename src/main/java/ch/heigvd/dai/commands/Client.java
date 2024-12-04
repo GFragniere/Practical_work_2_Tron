@@ -1,6 +1,7 @@
 package ch.heigvd.dai.commands;
 import java.util.concurrent.Callable;
 import picocli.CommandLine;
+import ch.heigvd.dai.tronocol.*;
 
 @CommandLine.Command(
         name = "client",
@@ -16,9 +17,21 @@ public class Client implements Callable<Integer>{
     protected String host;
 
     @CommandLine.Option(
+            names = {"-U", "--username"},
+            description = "Username to use",
+            required = true)
+    protected String username;
+
+    @CommandLine.Option(
+            names = {"-C", "--color"},
+            description = "color to use: 0:Red,1:Purple,2:Green,3:Blue",
+            required = true)
+    protected short color;
+
+    @CommandLine.Option(
             names = {"-M", "--multicast-address"},
             description = "Multicast address to use (default: ${DEFAULT-VALUE}).",
-            defaultValue = "230.1.2.3")
+            defaultValue = "230.0.0.0")
     protected String multicastAddress;
 
     @CommandLine.Option(
@@ -29,7 +42,8 @@ public class Client implements Callable<Integer>{
 
     @Override
     public Integer call() {
-        throw new UnsupportedOperationException(
-                "Please remove this exception and implement this method.");
+        TronocolClient tronocolClient = new TronocolClient(port,multicastAddress,host,"e0/1",username,color);
+        tronocolClient.start();
+        return 0;
     }
 }

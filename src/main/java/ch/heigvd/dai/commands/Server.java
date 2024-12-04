@@ -1,6 +1,8 @@
 package ch.heigvd.dai.commands;
 import java.net.InetAddress;
 import java.util.concurrent.Callable;
+
+import ch.heigvd.dai.tronocol.TronocolServer;
 import picocli.CommandLine;
 
 @CommandLine.Command(
@@ -14,7 +16,7 @@ public class Server implements  Callable<Integer>{
     @CommandLine.Option(
             names = {"-M", "--multicast-address"},
             description = "Multicast address to use (default: ${DEFAULT-VALUE}).",
-            defaultValue = "230.1.2.3")
+            defaultValue = "230.0.0.0")
     protected String multicastAddress;
 
     @CommandLine.Option(
@@ -27,13 +29,20 @@ public class Server implements  Callable<Integer>{
             names = {"-F", "--frequency"},
             description =
                     "Frequency of sending the message (in milliseconds) (default: ${DEFAULT-VALUE}).",
-            defaultValue = "200")
+            defaultValue = "100")
     protected int frequency;
+
+    @CommandLine.Option(
+            names = {"-PN", "--PlayerNumber"},
+            description = "Number of player between 1-4",
+            required = true)
+    protected int numberOfPlayer;
 
     @Override
     public Integer call() {
-        throw new UnsupportedOperationException(
-                "Please remove this exception and implement this method.");
+        TronocolServer server = new TronocolServer(multicastAddress, port, frequency,numberOfPlayer);
+        server.start();
+        return 0;
     }
 }
 
