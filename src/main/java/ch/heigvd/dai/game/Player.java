@@ -1,23 +1,17 @@
 package ch.heigvd.dai.game;
 
 import java.awt.*;
-import static com.raylib.Jaylib.Vector2;
-import static com.raylib.Jaylib.Color;
 
-
-enum Direction {
-    UP, DOWN, LEFT, RIGHT;
-}
 
 public class Player {
 
     final private Color color;
     final private String name;
-    private Vector2 position;
+    private Vector2D position;
     private Direction direction;
     private boolean dead;
 
-    public Player(Color color, String name, Vector2 position, Direction direction) {
+    public Player(Color color, String name, Vector2D position, Direction direction) {
         this.color = color;
         this.name = name;
         this.position = position;
@@ -29,11 +23,11 @@ public class Player {
         this.direction = direction;
     }
 
-    public void setPosition(Vector2 position) {
+    public void setPosition(Vector2D position) {
         this.position = position;
     }
 
-    public Vector2 getPosition() {
+    public Vector2D getPosition() {
         return position;
     }
 
@@ -60,16 +54,16 @@ public class Player {
     public void move(){
         switch (direction) {
             case UP:
-                position.y(position.y() - 1f);
+                position.setY(position.getY() - 1);
                 break;
             case DOWN:
-                position.y(position.y() + 1f);
+                position.setY(position.getY() + 1);
                 break;
             case LEFT:
-                position.x(position.x() - 1f);
+                position.setX(position.getX() - 1);
                 break;
             case RIGHT:
-                position.x(position.x() + 1f);
+                position.setX(position.getX() + 1);
                 break;
             default:
         }

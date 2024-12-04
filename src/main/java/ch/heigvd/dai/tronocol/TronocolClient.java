@@ -1,5 +1,6 @@
 package ch.heigvd.dai.tronocol;
 
+import ch.heigvd.dai.game.Player;
 import ch.heigvd.dai.game.Tronocol;
 import ch.heigvd.dai.game.TronocolGraphics;
 
@@ -8,98 +9,124 @@ import java.net.*;
 import java.io.*;
 
 public class TronocolClient {
+
+    private static final Color[] COLORS = {
+            new Color(255,0,0,255), new Color(255,0,255,255),
+            new Color(0,255,0,255), new Color(0,0,255,255)};
+
     private final int PORT;
     private final String MULTICAST_ADDRESS;
     private final String HOST;
     private final String NETWORK_INTERFACE;
+    private final String USERNAME;
+    private final Color COLOR;
     private Tronocol tronocol;
     private final TronocolGraphics tronocolGraphics;
+    private UnicastTransmission unicastTransmission;
 
-    public TronocolClient(int PORT, String MULTICAST_ADDRESS, String HOST, String NETWORK_INTERFACE) {
+    public TronocolClient(int PORT, String MULTICAST_ADDRESS, String HOST, String NETWORK_INTERFACE, String USERNAME, int COLORINDEX) {
         this.PORT = PORT;
         this.MULTICAST_ADDRESS = MULTICAST_ADDRESS;
         this.HOST = HOST;
         this.NETWORK_INTERFACE = NETWORK_INTERFACE;
+        this.USERNAME = USERNAME;
+        this.COLOR = COLORS[COLORINDEX];
         this.tronocol = new Tronocol(1, TronocolGraphics.HEIGHT/TronocolGraphics.BLOCKSIZE,TronocolGraphics.WIDTH/TronocolGraphics.BLOCKSIZE);
-        this.tronocolGraphics = new TronocolGraphics(tronocol);
+        this.tronocolGraphics = new TronocolGraphics(tronocol,this);
     }
 
     public void start() {
         System.out.println("[Client] starting");
         System.out.println("[Client] transmitting to server via port " + PORT);
-        Thread unicastThread = new Thread(new UnicastTransmission(PORT, HOST));
+        this.unicastTransmission = new UnicastTransmission(PORT, HOST);
+        Thread unicastThread = new Thread(unicastTransmission);
         unicastThread.start();
-        while(true);
-        //Thread multicastThread = new Thread(new MulticastTransmission(MULTICAST_ADDRESS, PORT, NETWORK_INTERFACE));
-        //multicastThread.start();
+        Thread multicastThread = new Thread(new MulticastTransmission(MULTICAST_ADDRESS, PORT, NETWORK_INTERFACE));
+        multicastThread.start();
+        tronocolGraphics.run();
+    }
+
+    public void send_update(Object ... objects){
+        unicastTransmission.send(objects,USERNAME);
     }
 
     class UnicastTransmission implements Runnable {
         private final int PORT;
         private final String HOST;
+        private final DatagramSocket socket;
 
-        public UnicastTransmission(int PORT, String HOST) {
+        public UnicastTransmission(int PORT, String HOST){
             this.PORT = PORT;
             this.HOST = HOST;
+            try{
+                this.socket = new DatagramSocket();
+            } catch (SocketException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         @Override
         public void run() {
-            try(DatagramSocket socket = new DatagramSocket();){
                 String command = "JOIN";
-                String username = "Habarosk";
-                Color color = new Color(255,0,0,255);
-                try
-                {
-                    //Create all the necessary buffered output/input
-                    //output
-                    ByteArrayOutputStream byteStreamOut = new ByteArrayOutputStream(10000);
-                    ObjectOutputStream os = new ObjectOutputStream(new BufferedOutputStream(byteStreamOut));
-
-                    InetAddress address = InetAddress.getByName(HOST);
-
-                    //write object to send
-                    os.writeObject(command);
-                    os.writeObject(username);
-                    os.writeObject(color);
-                    os.flush();
-
-                    //send datagram to server
-                    byte[] sendBuf = byteStreamOut.toByteArray();
-                    DatagramPacket sendpacket = new DatagramPacket(sendBuf, sendBuf.length, address, PORT);
-                    socket.send(sendpacket);
-
-                    //receive datagram from server
-                    byte[] requestBuffer = new byte[10000];
-                    DatagramPacket requestPacket = new DatagramPacket(requestBuffer, requestBuffer.length);
-
-                    socket.receive(requestPacket);
-
-                    ByteArrayInputStream byteStreamIn = new ByteArrayInputStream(requestBuffer);
-                    ObjectInputStream is = new ObjectInputStream(new BufferedInputStream(byteStreamIn));
-
-                    String response = (String) is.readObject();
-
-                    switch(response){
-                        case "OK":
-                            System.out.println("OK");
-                            break;
-                        case "ERROR":
-                            Integer code = (Integer) is.readObject();
-                            System.out.println("ERROR: " + code);
+                send(command,USERNAME,COLOR);
+                //receive datagram from server
+                Object[] data = receive();
+                switch((String) data[0]){
+                    case "OK":
+                        System.out.println("[Client] OK");
+                        break;
+                    case "ERROR":
+                        System.out.println("[Client] ERROR:" + (Integer)data[1] + "\n");
+                        switch ((Integer)data[1]) {
+                            case 1:
+                                System.out.println("[Client] username already taken");
+                                break;
+                            case 2:
+                                System.out.println("[Client] color already taken");
+                                break;
+                        }
+                        socket.close();
+                        tronocolGraphics.exit();
                     }
+        }
+        private void send(Object... objects){
+            try(ByteArrayOutputStream byteStreamOut = new ByteArrayOutputStream(10000);
+                ObjectOutputStream os = new ObjectOutputStream(new BufferedOutputStream(byteStreamOut));)
+            {
+                InetAddress address = InetAddress.getByName(HOST);
+                Integer count = Integer.valueOf(objects.length);
+                os.writeObject(count);
+                for(Object object : objects){
+                    os.writeObject(object);
                 }
-                catch (UnknownHostException e)
-                {
-                    System.err.println("Exception:  " + e);
-                    e.printStackTrace();
-                }
+                os.flush();
+                byte[] sendBuf = byteStreamOut.toByteArray();
+                DatagramPacket sendpacket = new DatagramPacket(sendBuf, sendBuf.length, address, PORT);
+                socket.send(sendpacket);
             } catch (Exception e) {
-                System.err.println("[Client] An error occurred: " + e.getMessage());
+                System.err.println("[Client] ERROR: SENDING " + e);
+            }
+        }
+
+        private Object[] receive(){
+            try{
+                byte[] requestBuffer = new byte[10000];
+                DatagramPacket requestPacket = new DatagramPacket(requestBuffer, requestBuffer.length);
+                socket.receive(requestPacket);
+                ByteArrayInputStream byteStreamIn = new ByteArrayInputStream(requestBuffer);
+                ObjectInputStream is = new ObjectInputStream(new BufferedInputStream(byteStreamIn));
+                Integer numberObject = (Integer) is.readObject();
+                Object[] data = new Object[numberObject];
+                for(int i = 0; i < numberObject; i++){
+                    data[i] = is.readObject();
+                }
+                return data;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
     }
-    /*
+
     class MulticastTransmission implements Runnable {
         private final String MULTICAST_ADDRESS;
         private final int PORT;
@@ -113,26 +140,26 @@ public class TronocolClient {
 
         @Override
         public void run() {
-            try (MulticastSocket socket = new MulticastSocket(PORT)) {
+            try (MulticastSocket socket = new MulticastSocket(42070)) {
                 // Join the multicast group
                 InetAddress multicastAddress = InetAddress.getByName(MULTICAST_ADDRESS);
-                InetSocketAddress multicastGroup = new InetSocketAddress(multicastAddress, PORT);
+                InetSocketAddress multicastGroup = new InetSocketAddress(multicastAddress, 42070);
                 NetworkInterface networkInterface = NetworkInterface.getByName(NETWORK_INTERFACE);
                 socket.joinGroup(multicastGroup, networkInterface);
 
                 while (!socket.isClosed()) {
-                    // Create a buffer for the incoming message
-                    byte[] buffer = new byte[1024];
-
-                    // Create a packet for the incoming message
-                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+                    byte[] requestBuffer = new byte[10000];
+                    DatagramPacket requestPacket = new DatagramPacket(requestBuffer, requestBuffer.length);
+                    socket.receive(requestPacket);
+                    ByteArrayInputStream byteStreamIn = new ByteArrayInputStream(requestBuffer);
+                    ObjectInputStream is = new ObjectInputStream(new BufferedInputStream(byteStreamIn));
 
                     // Receive the packet - this is a blocking call
-                    socket.receive(packet);
+                    socket.receive(requestPacket);
 
                     // Treat the data from the listened multicast here
+                    tronocol = (Tronocol) is.readObject();
                 }
-
                 // Quit the multicast group
                 socket.leaveGroup(multicastGroup, networkInterface);
 
@@ -140,5 +167,5 @@ public class TronocolClient {
                 System.err.println("[Client] An error occurred: " + e.getMessage());
             }
         }
-    }*/
+    }
 }
