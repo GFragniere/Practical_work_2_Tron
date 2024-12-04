@@ -5,22 +5,21 @@ import ch.heigvd.dai.game.*;
 import java.awt.*;
 import java.io.*;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
+import java.util.concurrent.Semaphore;
 
 public class TronocolServer {
     private final String MULTICAST_ADDRESS;
     private final int PORT;
     private final int frequency;
-    private final Tronocol tronocol = new Tronocol(1,
-            TronocolGraphics.HEIGHT / TronocolGraphics.BLOCKSIZE,
-            TronocolGraphics.WIDTH / TronocolGraphics.BLOCKSIZE);
+    private final Tronocol tronocol;
     private boolean running = true;
+    private static final Semaphore MUTEX  = new Semaphore(1);
 
-
-    public TronocolServer(String MULTICAST_ADRESS, int PORT, int frequency) {
+    public TronocolServer(String MULTICAST_ADRESS, int PORT, int frequency,int numberPlayer) {
         this.MULTICAST_ADDRESS = MULTICAST_ADRESS;
         this.PORT = PORT;
         this.frequency = frequency;
+        this.tronocol = new Tronocol(numberPlayer, TronocolGraphics.HEIGHT / TronocolGraphics.BLOCKSIZE, TronocolGraphics.WIDTH / TronocolGraphics.BLOCKSIZE);
     }
 
     public void start() {
@@ -55,13 +54,12 @@ public class TronocolServer {
                     String request = (String) data[2];
                     String response = "";
                     Integer error;
-                    Integer count;
 
                     switch (request){
                         case "JOIN":
                             System.out.println("[Server] joining");
                             String name = (String) data[3];
-                            Color color = (Color) data[4];
+                            short color = (short) data[4];
                             System.out.println("[Server] color: " + color);
                             System.out.println("[Server] name: " + name);
 
@@ -74,15 +72,12 @@ public class TronocolServer {
                                     if (players[i].getName().contentEquals(name)) {
                                         response = "ERROR";
                                         error = 1;
-                                        count = Integer.valueOf(2);
                                         send((InetAddress)data[0],(int)data[1], response, error);
                                         break;
-                                    } else if (players[i].getColor().equals(color)) {
+                                    } else if (players[i].getColor() == color) {
                                         response = "ERROR";
                                         error = 2;
-                                        count = Integer.valueOf(2);
-
-                                        send((InetAddress)data[0],(int)data[1],count, response, error);
+                                        send((InetAddress)data[0],(int)data[1], response, error);
                                         break;
                                     }
                                 }
@@ -93,14 +88,12 @@ public class TronocolServer {
                             } else {
                                 response = "ERROR";
                                 error = 3;
-                                count = Integer.valueOf(2);
-                                send((InetAddress)data[0],(int)data[1], count, response, error);
+                                send((InetAddress)data[0],(int)data[1], response, error);
                             }
 
                             if (!response.contentEquals("ERROR")) {
                                 response = "OK";
-                                count = Integer.valueOf(1);
-                                send((InetAddress)data[0],(int)data[1], count, response);
+                                send((InetAddress)data[0],(int)data[1], response);
                             }
                             break;
                         case "UPDATE":
@@ -109,7 +102,9 @@ public class TronocolServer {
                             System.out.println("[Server] updating " + playerName + " " + direction);
                             for (int i = 0; i < tronocol.getCurrentNumberOfPlayer(); i++) {
                                 if (tronocol.getPlayer()[i].getName().contentEquals(playerName)) {
+                                    MUTEX.acquire();
                                     tronocol.getPlayer()[i].setDirection(direction);
+                                    MUTEX.release();
                                     break;
                                 }
                             }
@@ -124,7 +119,7 @@ public class TronocolServer {
         private Object[] receive() {
             try {
                 // Create a buffer for the incoming request
-                byte[] requestBuffer = new byte[10000];
+                byte[] requestBuffer = new byte[65535];
 
                 // Create a packet for the incoming request
                 DatagramPacket requestPacket = new DatagramPacket(requestBuffer, requestBuffer.length);
@@ -133,7 +128,7 @@ public class TronocolServer {
                 InetAddress address = requestPacket.getAddress();
                 int port = requestPacket.getPort();
 
-                ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream(10000);
+                ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream(65535);
                 ObjectOutputStream os = new ObjectOutputStream(new BufferedOutputStream(byteOutputStream));
 
                 ByteArrayInputStream byteInputStream = new ByteArrayInputStream(requestBuffer);
@@ -158,6 +153,8 @@ public class TronocolServer {
             try(ByteArrayOutputStream byteStreamOut = new ByteArrayOutputStream(10000);
                 ObjectOutputStream os = new ObjectOutputStream(new BufferedOutputStream(byteStreamOut));)
             {
+                Integer count = Integer.valueOf(objects.length);
+                os.writeObject(count);
                 for(Object object : objects){
                     os.writeObject(object);
                 }
@@ -166,7 +163,7 @@ public class TronocolServer {
                 DatagramPacket sendpacket = new DatagramPacket(sendBuf, sendBuf.length, address, port);
                 socket.send(sendpacket);
             } catch (Exception e) {
-                System.err.println("[Client] ERROR: " + e);
+                System.err.println("[Server] ERROR: " + e);
             }
         }
     }
@@ -182,28 +179,28 @@ public class TronocolServer {
 
         @Override
         public void run() {
-                try (DatagramSocket  socket = new DatagramSocket();
-                     ByteArrayOutputStream byteOutStream = new ByteArrayOutputStream(10000);
-                     ObjectOutputStream os = new ObjectOutputStream(new BufferedOutputStream(byteOutStream));) {
+                try (DatagramSocket  socket = new DatagramSocket()) {
                     InetAddress multicastAddress = InetAddress.getByName(MULTICAST_ADDRESS);
                     while(!socket.isClosed()) {
-                        tronocol.update();
                         if(tronocol.GameReady()) {
-
+                            ByteArrayOutputStream byteOutStream = new ByteArrayOutputStream(10000);
+                            ObjectOutputStream os = new ObjectOutputStream(new BufferedOutputStream(byteOutStream));
+                            MUTEX.acquire();
+                            os.flush();
                             os.writeObject(tronocol);
                             os.flush();
-
                             byte[] sendBuf = byteOutStream.toByteArray();
-
                             DatagramPacket packet = new DatagramPacket(sendBuf, sendBuf.length, multicastAddress, 42070);
                             socket.send(packet);
+                            MUTEX.release();
+                            tronocol.update();
                             Thread.sleep(frequency);
                         }
                     }
                 } catch (Exception e) {
                     System.err.println("[Server] [Multicast] An error occurred in Multicast: " + e.getMessage());
+                    running = false;
                 }
-
         }
     }
 }

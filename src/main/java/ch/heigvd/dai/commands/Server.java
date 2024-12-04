@@ -29,12 +29,18 @@ public class Server implements  Callable<Integer>{
             names = {"-F", "--frequency"},
             description =
                     "Frequency of sending the message (in milliseconds) (default: ${DEFAULT-VALUE}).",
-            defaultValue = "200")
+            defaultValue = "100")
     protected int frequency;
+
+    @CommandLine.Option(
+            names = {"-PN", "--PlayerNumber"},
+            description = "Number of player between 1-4",
+            required = true)
+    protected int numberOfPlayer;
 
     @Override
     public Integer call() {
-        TronocolServer server = new TronocolServer(multicastAddress, port, frequency);
+        TronocolServer server = new TronocolServer(multicastAddress, port, frequency,numberOfPlayer);
         server.start();
         return 0;
     }

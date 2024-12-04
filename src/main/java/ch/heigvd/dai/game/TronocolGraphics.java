@@ -3,13 +3,18 @@ import ch.heigvd.dai.tronocol.TronocolClient;
 import com.raylib.Jaylib;
 
 import static com.raylib.Jaylib.*;
-import java.awt.Color;
 
 public class TronocolGraphics implements Runnable{
 
-    public final static int HEIGHT = 200;
-    public final static int WIDTH = 200;
-    public final static int BLOCKSIZE = 5;
+    public static final Jaylib.Color[] COLORS = {
+            new Jaylib.Color(255,0,0,255), new Jaylib.Color(255,0,255,255),
+            new Jaylib.Color(0,255,0,255), new Jaylib.Color(0,0,255,255),
+            new Jaylib.Color(0,0,0,255) , new Jaylib.Color(18,132,223,255)
+    };
+
+    public final static int HEIGHT = 800;
+    public final static int WIDTH = 800;
+    public final static int BLOCKSIZE = 10;
     private boolean shouldExit = false;
     private final static String UPDATE = "UPDATE";
     private Tronocol game;
@@ -36,18 +41,17 @@ public class TronocolGraphics implements Runnable{
     public void run() {
         SetTraceLogLevel(7);
         InitWindow(WIDTH, HEIGHT, "Tronocol");
-        SetTargetFPS(60);
+        SetTargetFPS(10);
         while (!WindowShouldClose() && !shouldExit) {
             BeginDrawing();
             if(this.game.GameReady()){
-                System.out.println("Coucou");
-                if (IsKeyDown(KEY_LEFT)) client.send_update(UPDATE,Integer.valueOf(2));
-                if (IsKeyDown(KEY_RIGHT)) client.send_update(UPDATE,Integer.valueOf(3));
-                if (IsKeyDown(KEY_DOWN)) client.send_update(UPDATE,Integer.valueOf(1));
-                if (IsKeyDown(KEY_UP)) client.send_update(UPDATE, Integer.valueOf(0));
+                if (IsKeyDown(KEY_LEFT)) client.send_update(UPDATE,Direction.LEFT.ordinal(),client.getUsername());
+                if (IsKeyDown(KEY_RIGHT)) client.send_update(UPDATE,Direction.RIGHT.ordinal(),client.getUsername());
+                if (IsKeyDown(KEY_DOWN)) client.send_update(UPDATE,Direction.DOWN.ordinal(),client.getUsername());
+                if (IsKeyDown(KEY_UP)) client.send_update(UPDATE, Direction.UP.ordinal(),client.getUsername());
                 ClearBackground(BLACK);
 
-                Color[][] world = game.getWorld();
+                short[][] world = game.getWorld();
                 for (Player p : game.getPlayer()) {
                     DrawRectangle((int) p.getPosition().getX() * BLOCKSIZE, (int) p.getPosition().getY() * BLOCKSIZE, BLOCKSIZE, BLOCKSIZE, translateColor(p.getColor()));
                 }
@@ -62,8 +66,8 @@ public class TronocolGraphics implements Runnable{
         CloseWindow();
     }
 
-    private Jaylib.Color translateColor(Color color){
-        return new Jaylib.Color(color.getRed(),color.getBlue(),color.getGreen(),color.getAlpha());
+    private Jaylib.Color translateColor(Short color){
+        return COLORS[color];
     }
 }
 
