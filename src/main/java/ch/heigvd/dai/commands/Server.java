@@ -16,7 +16,7 @@ public class Server implements  Callable<Integer>{
     @CommandLine.Option(
             names = {"-M", "--multicast-address"},
             description = "Multicast address to use (default: ${DEFAULT-VALUE}).",
-            defaultValue = "230.0.0.1")
+            defaultValue = "230.0.0.0")
     protected String multicastAddress;
 
     @CommandLine.Option(

@@ -1,11 +1,12 @@
 package ch.heigvd.dai.game;
 import java.awt.*;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 
 
-public class Tronocol {
+public class Tronocol implements Serializable{
 
     private static int worldWidth = TronocolGraphics.WIDTH / TronocolGraphics.BLOCKSIZE;
     private static int worldHeight = TronocolGraphics.HEIGHT / TronocolGraphics.BLOCKSIZE;

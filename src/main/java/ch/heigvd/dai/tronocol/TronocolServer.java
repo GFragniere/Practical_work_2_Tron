@@ -183,14 +183,12 @@ public class TronocolServer {
 
         @Override
         public void run() {
-                try (MulticastSocket socket = new MulticastSocket();
+                try (DatagramSocket  socket = new DatagramSocket();
                      ByteArrayOutputStream byteOutStream = new ByteArrayOutputStream(10000);
                      ObjectOutputStream os = new ObjectOutputStream(new BufferedOutputStream(byteOutStream));) {
                     InetAddress multicastAddress = InetAddress.getByName(MULTICAST_ADDRESS);
-                    while(true) {
-                        System.out.println("[Server] not ready");
+                    while(!socket.isClosed()) {
                         if(tronocol.GameReady()) {
-                            System.out.println("[Server] ready");
 
                             os.writeObject(tronocol);
                             os.flush();
@@ -203,7 +201,7 @@ public class TronocolServer {
                         }
                     }
                 } catch (Exception e) {
-                    System.err.println("[Server] An error occurred in Multicast: " + e.getMessage());
+                    System.err.println("[Server] [Multicast] An error occurred in Multicast: " + e.getMessage());
                 }
 
         }
