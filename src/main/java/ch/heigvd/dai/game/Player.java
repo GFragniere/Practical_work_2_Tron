@@ -1,9 +1,10 @@
 package ch.heigvd.dai.game;
 
 import java.awt.*;
+import java.io.Serializable;
 
 
-public class Player {
+public class Player implements Serializable {
 
     final private Color color;
     final private String name;

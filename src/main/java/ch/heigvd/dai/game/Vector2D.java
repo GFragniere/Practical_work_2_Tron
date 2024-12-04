@@ -1,8 +1,8 @@
 package ch.heigvd.dai.game;
 
-public class Vector2D {
+import java.io.Serializable;
 
-
+public class Vector2D implements Serializable {
 
     private int x;
     private int y;

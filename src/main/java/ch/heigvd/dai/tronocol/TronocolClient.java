@@ -159,12 +159,13 @@ public class TronocolClient {
 
                     // Treat the data from the listened multicast here
                     tronocol = (Tronocol) is.readObject();
+                    System.out.println(tronocol);
                 }
                 // Quit the multicast group
                 socket.leaveGroup(multicastGroup, networkInterface);
 
             } catch (Exception e) {
-                System.err.println("[Client] An error occurred: " + e.getMessage());
+                System.err.println("[Client] [Multicast] An error occurred: " + e.getMessage());
             }
         }
     }

@@ -7,8 +7,8 @@ import java.awt.Color;
 
 public class TronocolGraphics implements Runnable{
 
-    public final static int HEIGHT = 900;
-    public final static int WIDTH = 1800;
+    public final static int HEIGHT = 400;
+    public final static int WIDTH = 400;
     public final static int BLOCKSIZE = 5;
     private boolean shouldExit = false;
     private final static String UPDATE = "UPDATE";
