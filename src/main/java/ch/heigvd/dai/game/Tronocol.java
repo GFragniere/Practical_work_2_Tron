@@ -1,15 +1,28 @@
 package ch.heigvd.dai.game;
-import static com.raylib.Jaylib.Color;
+import java.awt.*;
 
 import java.util.Arrays;
 
+
+
 public class Tronocol {
+
+    private static int worldWidth = TronocolGraphics.WIDTH / TronocolGraphics.BLOCKSIZE;
+    private static int worldHeight = TronocolGraphics.HEIGHT / TronocolGraphics.BLOCKSIZE;
+
+    public static final Vector2D[] POSITIONS = {
+            new Vector2D(worldWidth + 5, worldHeight + 5),
+            new Vector2D(worldWidth - 5, worldHeight - 5),
+            new Vector2D(worldWidth + 5, worldHeight - 5),
+            new Vector2D(worldWidth - 5, worldHeight + 5),
+    };
+
     final private int numberOfPlayer;
     private int currentNumberOfPlayer = 0;
     private Player[] players;
     private Color[][] world;
     final private Color boardColor = new Color(0,0,0,255);
-    final private Color borderColor = new Color(200,0,200,255);
+    final private Color borderColor = new Color(114, 10, 114,255);
 
     public Tronocol(int numberOfPlayer,int height,int width) {
         this.numberOfPlayer = numberOfPlayer;
@@ -34,6 +47,10 @@ public class Tronocol {
         return currentNumberOfPlayer == numberOfPlayer;
     }
 
+    public int getCurrentNumberOfPlayer() {
+        return currentNumberOfPlayer;
+    }
+
     public void update(){
         for(Player player : players){
             if(!player.isDead()) {
@@ -42,14 +59,14 @@ public class Tronocol {
                     removePlayerFromBoard(player);
                     continue;
                 }
-                world[(int) player.getPosition().y()][(int) player.getPosition().x()] = player.getColor();
+                world[(int) player.getPosition().getY()][(int) player.getPosition().getX()] = player.getColor();
                 player.move();
             }
         }
     }
 
     private boolean collision(Player player) {
-        return !world[(int) player.getPosition().y()][(int) player.getPosition().x()].equals(boardColor);
+        return !world[(int) player.getPosition().getY()][(int) player.getPosition().getX()].equals(boardColor);
     }
 
     private void removePlayerFromBoard(Player player) {
