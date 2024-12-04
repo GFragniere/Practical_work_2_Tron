@@ -10,27 +10,23 @@ import java.io.*;
 
 public class TronocolClient {
 
-    private static final Color[] COLORS = {
-            new Color(255,0,0,255), new Color(255,0,255,255),
-            new Color(0,255,0,255), new Color(0,0,255,255)};
-
     private final int PORT;
     private final String MULTICAST_ADDRESS;
     private final String HOST;
     private final String NETWORK_INTERFACE;
     private final String USERNAME;
-    private final Color COLOR;
+    private final short COLOR;
     protected Tronocol tronocol;
     private final TronocolGraphics tronocolGraphics;
     private UnicastTransmission unicastTransmission;
 
-    public TronocolClient(int PORT, String MULTICAST_ADDRESS, String HOST, String NETWORK_INTERFACE, String USERNAME, int COLORINDEX) {
+    public TronocolClient(int PORT, String MULTICAST_ADDRESS, String HOST, String NETWORK_INTERFACE, String USERNAME, short COLORINDEX) {
         this.PORT = PORT;
         this.MULTICAST_ADDRESS = MULTICAST_ADDRESS;
         this.HOST = HOST;
         this.NETWORK_INTERFACE = NETWORK_INTERFACE;
         this.USERNAME = USERNAME;
-        this.COLOR = COLORS[COLORINDEX];
+        this.COLOR = COLORINDEX;
         this.tronocol = new Tronocol(1, TronocolGraphics.HEIGHT/TronocolGraphics.BLOCKSIZE,TronocolGraphics.WIDTH/TronocolGraphics.BLOCKSIZE);
         this.tronocolGraphics = new TronocolGraphics(tronocol,this);
     }
@@ -43,13 +39,15 @@ public class TronocolClient {
         unicastThread.start();
         Thread multicastThread = new Thread(new MulticastTransmission(MULTICAST_ADDRESS, PORT, NETWORK_INTERFACE));
         multicastThread.start();
-        Thread graphicThread = new Thread(tronocolGraphics);
-        graphicThread.start();
-        while(true);
+        tronocolGraphics.run();
     }
 
     public void send_update(Object ... objects){
-        unicastTransmission.send(objects, USERNAME);
+        unicastTransmission.send(objects);
+    }
+
+    public String getUsername(){
+        return USERNAME;
     }
 
     class UnicastTransmission implements Runnable {
@@ -142,25 +140,25 @@ public class TronocolClient {
 
         @Override
         public void run() {
-            try (MulticastSocket socket = new MulticastSocket(42070)) {
+            try (MulticastSocket socket = new MulticastSocket(PORT + 1)) {
                 // Join the multicast group
                 InetAddress multicastAddress = InetAddress.getByName(MULTICAST_ADDRESS);
-                InetSocketAddress multicastGroup = new InetSocketAddress(multicastAddress, 42070);
+                InetSocketAddress multicastGroup = new InetSocketAddress(multicastAddress, PORT + 1);
                 NetworkInterface networkInterface = NetworkInterface.getByName(NETWORK_INTERFACE);
                 socket.joinGroup(multicastGroup, networkInterface);
-
                 while (!socket.isClosed()) {
 
-                    byte[] requestBuffer = new byte[10000];
+                    byte[] requestBuffer = new byte[65535];
                     DatagramPacket requestPacket = new DatagramPacket(requestBuffer, requestBuffer.length);
+
                     socket.receive(requestPacket);
                     ByteArrayInputStream byteStreamIn = new ByteArrayInputStream(requestBuffer);
                     ObjectInputStream is = new ObjectInputStream(new BufferedInputStream(byteStreamIn));
 
-                    // Receive the packet - this is a blocking call
-                    socket.receive(requestPacket);
                     // Treat the data from the listened multicast here
-                    tronocolGraphics.setGame((Tronocol) is.readObject());
+                    Tronocol trono = (Tronocol) is.readObject(); // crashes sometimes here
+                    tronocolGraphics.setGame(trono);
+                    is.close();
                 }
                 // Quit the multicast group
                 socket.leaveGroup(multicastGroup, networkInterface);

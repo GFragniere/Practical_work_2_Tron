@@ -6,13 +6,13 @@ import java.io.Serializable;
 
 public class Player implements Serializable {
 
-    final private Color color;
+    final private short color;
     final private String name;
     private Vector2D position;
     private Direction direction;
     private boolean dead;
 
-    public Player(Color color, String name, Vector2D position, Direction direction) {
+    public Player(short color, String name, Vector2D position, Direction direction) {
         this.color = color;
         this.name = name;
         this.position = position;
@@ -36,7 +36,7 @@ public class Player implements Serializable {
         return direction;
     }
 
-    public Color getColor() {
+    public short getColor() {
         return color;
     }
 

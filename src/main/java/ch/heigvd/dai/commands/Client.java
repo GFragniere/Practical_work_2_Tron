@@ -26,7 +26,7 @@ public class Client implements Callable<Integer>{
             names = {"-C", "--color"},
             description = "color to use: 0:Red,1:Purple,2:Green,3:Blue",
             required = true)
-    protected int color;
+    protected short color;
 
     @CommandLine.Option(
             names = {"-M", "--multicast-address"},
