@@ -1,9 +1,6 @@
 package ch.heigvd.dai.tronocol;
 
-import ch.heigvd.dai.game.Direction;
-import ch.heigvd.dai.game.Player;
-import ch.heigvd.dai.game.Tronocol;
-import ch.heigvd.dai.game.TronocolGraphics;
+import ch.heigvd.dai.game.*;
 
 import java.awt.*;
 import java.io.*;
@@ -89,8 +86,10 @@ public class TronocolServer {
                                         break;
                                     }
                                 }
-                                if (!response.contentEquals("ERROR"))
-                                    tronocol.addPlayer(new Player(color, name, Tronocol.POSITIONS[currentPlayer], Direction.DOWN));
+                                if (!response.contentEquals("ERROR")) {
+                                    Direction playerDirection = currentPlayer % 3 == 0 ? Direction.DOWN : Direction.UP;
+                                    tronocol.addPlayer(new Player(color, name, Tronocol.POSITIONS[currentPlayer], playerDirection));
+                                }
                             } else {
                                 response = "ERROR";
                                 error = 3;
@@ -105,7 +104,7 @@ public class TronocolServer {
                             }
                             break;
                         case "UPDATE":
-                            Direction direction = (Direction) data[3];
+                            Direction direction = Direction.values()[(Integer) data[3]];
                             String playerName = (String) data[4];
                             System.out.println("[Server] updating " + playerName + " " + direction);
                             for (int i = 0; i < tronocol.getCurrentNumberOfPlayer(); i++) {
@@ -188,6 +187,7 @@ public class TronocolServer {
                      ObjectOutputStream os = new ObjectOutputStream(new BufferedOutputStream(byteOutStream));) {
                     InetAddress multicastAddress = InetAddress.getByName(MULTICAST_ADDRESS);
                     while(!socket.isClosed()) {
+                        tronocol.update();
                         if(tronocol.GameReady()) {
 
                             os.writeObject(tronocol);

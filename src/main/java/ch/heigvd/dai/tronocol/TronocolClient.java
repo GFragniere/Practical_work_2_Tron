@@ -49,7 +49,7 @@ public class TronocolClient {
     }
 
     public void send_update(Object ... objects){
-        unicastTransmission.send(objects,USERNAME);
+        unicastTransmission.send(objects, USERNAME);
     }
 
     class UnicastTransmission implements Runnable {
