@@ -1,16 +1,17 @@
 package ch.heigvd.dai.tronocol;
 
-import ch.heigvd.dai.game.Player;
 import ch.heigvd.dai.game.Tronocol;
 import ch.heigvd.dai.game.TronocolGraphics;
 
-import java.awt.*;
 import java.net.*;
 import java.io.*;
 
+/**
+ * The class that manages the tronocol client for unicast and multicast connection
+ */
 public class TronocolClient {
-
-    private final int PORT;
+    private final int PORT = 42069;
+    private final int MULTICAST_PORT = 42070;
     private final String MULTICAST_ADDRESS;
     private final String HOST;
     private final String NETWORK_INTERFACE;
@@ -20,44 +21,67 @@ public class TronocolClient {
     private final TronocolGraphics tronocolGraphics;
     private UnicastTransmission unicastTransmission;
 
-    public TronocolClient(int PORT, String MULTICAST_ADDRESS, String HOST, String NETWORK_INTERFACE, String USERNAME, short COLORINDEX) {
-        this.PORT = PORT;
+
+    /**
+     * The constructor for a TronocolClient instance.
+     * @param MULTICAST_ADDRESS The multicast address for the group to join by the socket
+     * @param NETWORK_INTERFACE The network interface used to listen for multicast data
+     * @param USERNAME The Username of the player
+     * @param COLORINDEX The Color choosen by the player as an index
+     */
+    public TronocolClient(String MULTICAST_ADDRESS, String HOST, String NETWORK_INTERFACE, String USERNAME, short COLORINDEX) {
         this.MULTICAST_ADDRESS = MULTICAST_ADDRESS;
         this.HOST = HOST;
         this.NETWORK_INTERFACE = NETWORK_INTERFACE;
         this.USERNAME = USERNAME;
         this.COLOR = COLORINDEX;
-        this.tronocol = new Tronocol(1, TronocolGraphics.HEIGHT/TronocolGraphics.BLOCKSIZE,TronocolGraphics.WIDTH/TronocolGraphics.BLOCKSIZE);
+        this.tronocol = new Tronocol(2);
         this.tronocolGraphics = new TronocolGraphics(tronocol,this);
     }
 
+    /**
+     *The method to start the TronocolClient to launch the unicast transmitter and the multicast transmitter
+     *It also starts the tronocol graphical instance
+     */
     public void start() {
         System.out.println("[Client] starting");
         System.out.println("[Client] transmitting to server via port " + PORT);
-        this.unicastTransmission = new UnicastTransmission(PORT, HOST);
+        this.unicastTransmission = new UnicastTransmission();
         Thread unicastThread = new Thread(unicastTransmission);
         unicastThread.start();
-        Thread multicastThread = new Thread(new MulticastTransmission(MULTICAST_ADDRESS, PORT, NETWORK_INTERFACE));
+        Thread multicastThread = new Thread(new MulticastTransmission());
         multicastThread.start();
         tronocolGraphics.run();
     }
 
+    /**
+     * The method used to send update from the graphical part to the socket to transmit
+     * the updates of movement
+     * @param objects Object transmitted to write into the datagram
+     */
     public void send_update(Object ... objects){
         unicastTransmission.send(objects);
     }
 
+    /**
+     * The method used to get the username int the graphical part
+     * @return the username of the player
+     */
     public String getUsername(){
         return USERNAME;
     }
 
+    /**
+     * The class that manage the unicast transmission of the client
+     */
     class UnicastTransmission implements Runnable {
-        private final int PORT;
-        private final String HOST;
         private final DatagramSocket socket;
 
-        public UnicastTransmission(int PORT, String HOST){
-            this.PORT = PORT;
-            this.HOST = HOST;
+        /**
+         * The constructor for a UnicastTransmission instance.
+         * It will instanciate the socket for the datagram communication using unicast
+         */
+        public UnicastTransmission(){
             try{
                 this.socket = new DatagramSocket();
             } catch (SocketException e) {
@@ -65,6 +89,11 @@ public class TronocolClient {
             }
         }
 
+        /**
+         * The run method that will be threaded
+         * It handle the logic for unicast communicating with the server
+         * For Joining the game
+         */
         @Override
         public void run() {
                 String command = "JOIN";
@@ -84,22 +113,33 @@ public class TronocolClient {
                             case 2:
                                 System.out.println("[Client] color already taken");
                                 break;
+                            case 3:
+                                System.out.println("[Client] party full");
                         }
                         socket.close();
                         tronocolGraphics.exit();
                     }
         }
+
+        /**
+         * The send method is used to send object over the network to the server
+         * @param objects object to send to the server
+         */
         private void send(Object... objects){
-            try(ByteArrayOutputStream byteStreamOut = new ByteArrayOutputStream(10000);
-                ObjectOutputStream os = new ObjectOutputStream(new BufferedOutputStream(byteStreamOut));)
+            try(
+                ByteArrayOutputStream byteStreamOut = new ByteArrayOutputStream(1000);
+                ObjectOutputStream objectOut = new ObjectOutputStream(new BufferedOutputStream(byteStreamOut));
+                )
             {
+
                 InetAddress address = InetAddress.getByName(HOST);
                 Integer count = Integer.valueOf(objects.length);
-                os.writeObject(count);
+                objectOut.writeObject(count);
+                objectOut.close();
                 for(Object object : objects){
-                    os.writeObject(object);
+                    objectOut.writeObject(object);
                 }
-                os.flush();
+                objectOut.flush();
                 byte[] sendBuf = byteStreamOut.toByteArray();
                 DatagramPacket sendpacket = new DatagramPacket(sendBuf, sendBuf.length, address, PORT);
                 socket.send(sendpacket);
@@ -108,6 +148,10 @@ public class TronocolClient {
             }
         }
 
+        /**
+         * The receive method handle receiving object from the server and returning them as an array of objects
+         * @return the object received by the server
+         */
         private Object[] receive(){
             try{
                 byte[] requestBuffer = new byte[10000];
@@ -127,28 +171,29 @@ public class TronocolClient {
         }
     }
 
+    /**
+     * The class that manage the multicast transmission of the client
+     */
     class MulticastTransmission implements Runnable {
-        private final String MULTICAST_ADDRESS;
-        private final int PORT;
-        private final String NETWORK_INTERFACE;
+        byte[] requestBuffer = new byte[65535];
 
-        public MulticastTransmission(String MULTICAST_ADDRESS, int PORT, String NETWORK_INTERFACE) {
-            this.MULTICAST_ADDRESS = MULTICAST_ADDRESS;
-            this.PORT = PORT;
-            this.NETWORK_INTERFACE = NETWORK_INTERFACE;
-        }
+        /**
+         * The constructor for a MulticastTransmission instance.
+         */
+        public MulticastTransmission() {}
 
+        /**
+         * The run method handle receiving the game and setting it in the graphical part
+         */
         @Override
         public void run() {
-            try (MulticastSocket socket = new MulticastSocket(PORT + 1)) {
+            try (MulticastSocket socket = new MulticastSocket(MULTICAST_PORT)) {
                 // Join the multicast group
                 InetAddress multicastAddress = InetAddress.getByName(MULTICAST_ADDRESS);
                 NetworkInterface networkInterface = NetworkInterface.getByName(NETWORK_INTERFACE);
-                InetSocketAddress multicastGroup = new InetSocketAddress(multicastAddress, PORT);
+                InetSocketAddress multicastGroup = new InetSocketAddress(multicastAddress, MULTICAST_PORT);
                 socket.joinGroup(multicastGroup,networkInterface);
-                while (!socket.isClosed()) {
-
-                    byte[] requestBuffer = new byte[65535];
+                while (true) {
                     DatagramPacket requestPacket = new DatagramPacket(requestBuffer, requestBuffer.length);
 
                     socket.receive(requestPacket);
@@ -159,10 +204,14 @@ public class TronocolClient {
                     Tronocol trono = (Tronocol) is.readObject(); // crashes sometimes here
                     tronocolGraphics.setGame(trono);
                     is.close();
+                    byteStreamIn.close();
+                    if(trono.onePlayerWinner()){
+                        break;
+                    }
                 }
                 // Quit the multicast group
                 socket.leaveGroup(multicastGroup,networkInterface);
-
+                socket.close();
             } catch (Exception e) {
                 System.err.println("[Client] [Multicast] An error occurred: " + e.getMessage());
             }

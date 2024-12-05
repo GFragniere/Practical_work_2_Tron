@@ -16,14 +16,8 @@ public class Server implements  Callable<Integer>{
     @CommandLine.Option(
             names = {"-M", "--multicast-address"},
             description = "Multicast address to use (default: ${DEFAULT-VALUE}).",
-            defaultValue = "224.0.0.1")
+            defaultValue = "239.0.0.0")
     protected String multicastAddress;
-
-    @CommandLine.Option(
-            names = {"-P", "--port"},
-            description = "Port to use (default: ${DEFAULT-VALUE}).",
-            defaultValue = "42069")
-    protected int port;
 
     @CommandLine.Option(
             names = {"-F", "--frequency"},
@@ -34,13 +28,14 @@ public class Server implements  Callable<Integer>{
 
     @CommandLine.Option(
             names = {"-PN", "--PlayerNumber"},
-            description = "Number of player between 1-4",
-            required = true)
+            description = "Number of player between 2-4 (default: ${DEFAULT-VALUE})",
+            defaultValue = "2"
+    )
     protected int numberOfPlayer;
 
     @Override
     public Integer call() {
-        TronocolServer server = new TronocolServer(multicastAddress, port, frequency,numberOfPlayer);
+        TronocolServer server = new TronocolServer(multicastAddress, frequency,numberOfPlayer);
         server.start();
         return 0;
     }

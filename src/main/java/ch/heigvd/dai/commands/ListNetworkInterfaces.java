@@ -7,7 +7,7 @@ import java.util.concurrent.Callable;
 import picocli.CommandLine.Command;
 
 /**
- * This is an utility command to list all available network interfaces.
+ * This is a utility command to list all available network interfaces.
  */
 @Command(name = "list-network-interfaces", description = "List all available network interfaces.")
 public class ListNetworkInterfaces implements Callable<Integer> {
