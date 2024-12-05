@@ -8,44 +8,44 @@ title Functionnal exemple
 
 ...Broadcast...
 
-Client1 <- Server: INFO 112233 10.9.200.8 42069 2 Server 1 Waiting Player
-Server -> Client2: INFO 112233 10.9.200.8 42069 2 Server 1 Waiting Player
+Client1 <- Server: 6 INFO 10.9.200.8 42069 2 1 Waiting
+Server -> Client2: 6 INFO 10.9.200.8 42069 2 1 Waiting
 
 == Join the server ==
 
-Client1 -> Server: JOIN Killian red
-Server -> Client1: OK 112233
+Client1 -> Server: 3 JOIN Killian red
+Server -> Client1: 1 OK
 
-Client2 -> Server: JOIN Guillaume violet
-Server -> Client2: OK 112233
+Client2 -> Server: 3 JOIN Guillaume violet
+Server -> Client2: 1 OK
 
 == Ready ==
 
 ...Broadcast...
 
-Client1 <- Server: READY 112233
-Server -> Client2: READY 112233
+Client1 <- Server: 1 READY
+Server -> Client2: 1 READY
 
 == Update from client ==
 
 ...Killian change direction...
 
-Client1 -> Server: UPDATE 112233 <Player Object>
+Client1 -> Server: 2 UPDATE <Direction>
 
 ...Guillaume change direction...
 
-Client2 -> Server: UPDATE 112233 <Player Object>
+Client2 -> Server: 2 UPDATE <Direction>
 
 ==  Update from server ==
 
 ...Broadcast every n millisecond...
 
-Client1 <- Server: UPDATE 112233 <Game Object>
-Client2 <- Server: UPDATE 112233 <Game Object>
+Client1 <- Server: 2 UPDATE <Game Object>
+Client2 <- Server: 2 UPDATE <Game Object>
 
 == Quit ==
 
-Client1 -> Server: QUIT 112233 Killian
-Client2 -> Server: QUIT 112233 Guillaume
+Client1 -> Server: 1 QUIT
+Client2 -> Server: 1 QUIT
 
 @enduml

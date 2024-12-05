@@ -37,18 +37,12 @@ public class Client implements Callable<Integer>{
     @CommandLine.Option(
             names = {"-M", "--multicast-address"},
             description = "Multicast address to use (default: ${DEFAULT-VALUE}).",
-            defaultValue = "224.0.0.1")
+            defaultValue = "239.0.0.0")
     protected String multicastAddress;
-
-    @CommandLine.Option(
-            names = {"-p", "--port"},
-            description = "Port to use (default: ${DEFAULT-VALUE}).",
-            defaultValue = "42069")
-    protected int port;
 
     @Override
     public Integer call() {
-        TronocolClient tronocolClient = new TronocolClient(port,multicastAddress,host,interfaceName,username,color);
+        TronocolClient tronocolClient = new TronocolClient(multicastAddress,host,interfaceName,username,color);
         tronocolClient.start();
         return 0;
     }
