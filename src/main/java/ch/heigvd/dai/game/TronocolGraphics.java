@@ -14,7 +14,7 @@ public class TronocolGraphics implements Runnable{
 
     public final static int HEIGHT = 800;
     public final static int WIDTH = 800;
-    public final static int BLOCKSIZE = 10;
+    public final static int BLOCKSIZE = 8;
     private boolean shouldExit = false;
     private final static String UPDATE = "UPDATE";
     private Tronocol game;
@@ -41,7 +41,7 @@ public class TronocolGraphics implements Runnable{
     public void run() {
         SetTraceLogLevel(7);
         InitWindow(WIDTH, HEIGHT, "Tronocol");
-        SetTargetFPS(10);
+        SetTargetFPS(60);
         while (!WindowShouldClose() && !shouldExit) {
             BeginDrawing();
             if(this.game.GameReady()){

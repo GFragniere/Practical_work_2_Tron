@@ -143,9 +143,9 @@ public class TronocolClient {
             try (MulticastSocket socket = new MulticastSocket(PORT + 1)) {
                 // Join the multicast group
                 InetAddress multicastAddress = InetAddress.getByName(MULTICAST_ADDRESS);
-                InetSocketAddress multicastGroup = new InetSocketAddress(multicastAddress, PORT + 1);
                 NetworkInterface networkInterface = NetworkInterface.getByName(NETWORK_INTERFACE);
-                socket.joinGroup(multicastGroup, networkInterface);
+                InetSocketAddress multicastGroup = new InetSocketAddress(multicastAddress, PORT);
+                socket.joinGroup(multicastGroup,networkInterface);
                 while (!socket.isClosed()) {
 
                     byte[] requestBuffer = new byte[65535];
@@ -161,7 +161,7 @@ public class TronocolClient {
                     is.close();
                 }
                 // Quit the multicast group
-                socket.leaveGroup(multicastGroup, networkInterface);
+                socket.leaveGroup(multicastGroup,networkInterface);
 
             } catch (Exception e) {
                 System.err.println("[Client] [Multicast] An error occurred: " + e.getMessage());
