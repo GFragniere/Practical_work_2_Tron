@@ -156,6 +156,8 @@ This will run the application from docker with the default values for the server
 It is possible to change the values of the docker by modifying values in the [Dockerfile](Dockerfile) in the corresponding emplacements, although not recommended.
 
 Please note that only the server is dockerized. Considering the amount of parameters the client has to give when connecting to the server, and the presence of a graphical user interface, the dockerization of the project for the client is tedious and necessary.
+
+You can download the packaged application [here](https://github.com/users/Killian-Viquerat/packages/container/package/tronocol_server).
 ## Dependencies
 
 The main dependencies we have in this project are:
